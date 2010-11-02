@@ -363,6 +363,7 @@ module CollectiveIdea #:nodoc:
           # Returns the level of this object in the tree
           # root level is 0
           def level
+            return depth if depth?
             parent_id.nil? ? 0 : ancestors.count
           end
 

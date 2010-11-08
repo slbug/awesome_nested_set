@@ -239,6 +239,23 @@ module CollectiveIdea #:nodoc:
               yield(o, path.length - 1)
             end
           end
+          
+          # Provides a chainable relation to select all descendants of a set of records, excluding the record set itself.
+          # Similar to parent.descendants, except this allows you to find all descendants of a set of nodes, 
+          # rather than being restricted to find the descendants of only a single node.
+          # 
+          # Example:
+          #     parents = Category.roots.all
+          #     parents_descendants = Category.where(:deleted => false).descendants_of(parents)
+          #     
+          def descendants_of(parents)
+            where_sql = returning [] do |sql|
+              parents.each do |parent|
+                sql << "(#{quoted_table_name}.#{quoted_left_column_name} >= #{parent.left} AND #{quoted_table_name}.#{quoted_right_column_name} <= #{parent.right})"
+              end
+            end
+            scoped.where(where_sql.join(" OR "))
+          end
 
           def before_move(*args, &block)
             set_callback :move, :before, *args, &block

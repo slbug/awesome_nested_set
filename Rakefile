@@ -36,7 +36,7 @@ begin
     gemspec.files = FileList["[A-Z]*", "lib/**/*"]
     gemspec.rubyforge_project = "awesome_nested_set"
     
-    gemspec.add_dependency('active_record', '>= 3.0.0')
+    gemspec.add_dependency('activerecord', '>= 3.0.0')
   end
   
   Jeweler::GemcutterTasks.new

@@ -12,6 +12,10 @@ Install as a plugin:
 
   rails plugin install git://github.com/galetahub/awesome_nested_set.git
   
+as a gem:
+
+  gem 'awesome_nested_set', :git => 'git://github.com/galetahub/awesome_nested_set.git'
+  
 == Usage
 
 To make use of awesome_nested_set, your model needs to have 3 fields: lft, rgt, and parent_id:

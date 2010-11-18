@@ -6,6 +6,7 @@ module CollectiveIdea
       autoload :Depth,        'awesome_nested_set/depth'
       autoload :Descendants,  'awesome_nested_set/descendants'
       autoload :Helper,       'awesome_nested_set/helper'
+      autoload :Version,      'awesome_nested_set/version'
     end
   end
 end

@@ -180,7 +180,7 @@ module CollectiveIdea #:nodoc:
           end
 
           # Rebuilds the left & rights if unset or invalid.  Also very useful for converting from acts_as_tree.
-          def rebuild!
+          def rebuild!(options = {})
             # Don't rebuild a valid tree.
             return true if valid?
 
@@ -209,11 +209,36 @@ module CollectiveIdea #:nodoc:
             # Find root node(s)
             root_nodes = where(parent_column_name => nil).
                 order("#{quoted_left_column_name}, #{quoted_right_column_name}, id").
-                all.each do |root_node|
+                find(:all, options).each do |root_node|
               # setup index for this scope
               indices[scope.call(root_node)] ||= 0
               set_left_and_rights.call(root_node)
             end
+          end
+
+          def scope_condition_by_options(options, table_name = nil)
+            table_name ||= self.quoted_table_name
+        
+            scope_string = Array(acts_as_nested_set_options[:scope]).reject{|s| !options.has_key?(s) }.map do |c|
+              "#{table_name}.#{connection.quote_column_name(c)} = #{options[c]}"
+            end.join(" AND ")
+        
+            scope_string.blank? ? "1 = 1" : scope_string
+          end
+          
+          def rebuild_level!(options={})
+            scope_t = scope_condition_by_options(options)
+            scope_a = scope_condition_by_options(options, 'a')
+            
+            query = "UPDATE #{quoted_table_name} a SET a.depth = \
+              (SELECT count(*) - 1 FROM (SELECT * FROM #{quoted_table_name} WHERE #{scope_t}) AS b \
+                WHERE #{scope_a} AND \
+                  a.`user_id` = b.`user_id` AND \
+                  (a.#{quoted_left_column_name} BETWEEN b.#{quoted_left_column_name} AND b.#{quoted_right_column_name}))
+                WHERE #{scope_a}
+            "
+            
+            connection.execute(query)
           end
 
           # Iterates over tree elements and determines the current level in the tree.

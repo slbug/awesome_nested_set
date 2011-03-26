@@ -21,7 +21,7 @@ module CollectiveIdea #:nodoc:
 
         # Update cached_level attribute
         def update_depth
-          self.update_attribute(:depth, level)
+          self.update_column(:depth, level)
         end
 
         # Update cached_level attribute for all record tree
